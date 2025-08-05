@@ -1,0 +1,42 @@
+# 基础深度学习框架
+torch>=1.9.0
+torchvision>=0.10.0
+numpy>=1.21.0
+
+# JAX相关（Nerfies原始依赖）
+jax>=0.3.0
+jaxlib>=0.3.0
+flax>=0.5.0
+optax>=0.1.0
+
+# 图像处理
+opencv-python>=4.5.0
+Pillow>=8.3.0
+scikit-image>=0.18.0
+imageio>=2.9.0
+
+# 3D处理和PBR相关
+trimesh>=3.9.0
+pyrender>=0.1.45
+moderngl>=5.6.0
+
+# Web框架
+flask>=2.0.0
+flask-cors>=3.0.0
+fastapi>=0.68.0
+uvicorn>=0.15.0
+
+# 数据处理
+pandas>=1.3.0
+scipy>=1.7.0
+matplotlib>=3.5.0
+seaborn>=0.11.0
+
+# 配置管理
+gin-config>=0.5.0
+omegaconf>=2.1.0
+
+# 其他工具
+tqdm>=4.62.0
+tensorboard>=2.7.0
+wandb>=0.12.0 

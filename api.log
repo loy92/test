@@ -1,0 +1,38 @@
+INFO:analysis.pbr_analyzer:PBR分析器初始化完成，使用设备: cpu
+INFO:__main__:✅ 已加载基础PBR分析器
+INFO:__main__:创建默认PBR模型，使用设备: cpu
+分析器状态: 优化=False, 基础=True, 简化=True
+启动PBR材质识别系统API服务器...
+使用设备: cpu
+模型状态: 已加载
+尝试在端口 5001 启动服务器...
+ * Serving Flask app 'app'
+ * Debug mode: off
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.10.80.149:5001
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug:127.0.0.1 - - [05/Aug/2025 10:56:23] "GET /api/health HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [05/Aug/2025 10:58:28] "GET /api/health HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [05/Aug/2025 10:58:35] "GET /api/health HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [05/Aug/2025 10:59:02] "OPTIONS /api/analyze HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+/Users/ithppc02088/Library/Python/3.9/lib/python/site-packages/skimage/feature/texture.py:360: UserWarning: Applying `local_binary_pattern` to floating-point images may give unexpected results when small numerical differences between adjacent pixels are present. It is recommended to use this function with images of integer dtype.
+  warnings.warn(
+INFO:__main__:分析结果: metallic=0.563, roughness=0.361, confidence=0.272
+INFO:__main__:PBR分析完成: {'metallic': 0.5627794250454374, 'roughness': 0.3611706280382379, 'transparency': 0.47575296561709923, 'normalStrength': 0.37443574102221794, 'confidence': 0.2720067450128534, 'base_color': [133, 131, 128], 'timestamp': '2025-08-05T11:02:03.655727', 'settings': {'numSamples': 64, 'enableDeformation': True}}
+INFO:werkzeug:127.0.0.1 - - [05/Aug/2025 11:02:03] "POST /api/analyze HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [05/Aug/2025 11:07:16] "GET /api/health HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [05/Aug/2025 11:07:17] "GET / HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+INFO:__main__:分析结果: metallic=0.200, roughness=0.500, confidence=0.149
+INFO:__main__:PBR分析完成: {'metallic': 0.2, 'roughness': 0.4999999999999993, 'transparency': 0.6038666666666668, 'normalStrength': 0.0, 'confidence': 0.1489440218919762, 'base_color': [255, 255, 0], 'timestamp': '2025-08-05T11:07:28.443096', 'settings': {}}
+INFO:werkzeug:127.0.0.1 - - [05/Aug/2025 11:07:28] "POST /api/analyze HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [05/Aug/2025 11:08:00] "OPTIONS /api/analyze HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+INFO:werkzeug:127.0.0.1 - - [05/Aug/2025 11:10:30] "OPTIONS /api/analyze HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+INFO:__main__:分析结果: metallic=0.561, roughness=0.291, confidence=0.206
+INFO:__main__:PBR分析完成: {'metallic': 0.5614257070398535, 'roughness': 0.29143609776949353, 'transparency': 0.47859167741018444, 'normalStrength': 0.08841051846217132, 'confidence': 0.20562401922977938, 'base_color': [149, 142, 133], 'timestamp': '2025-08-05T11:11:03.424493', 'settings': {'numSamples': 64, 'enableDeformation': True}}
+INFO:werkzeug:127.0.0.1 - - [05/Aug/2025 11:11:03] "POST /api/analyze HTTP/1.1" 200 -

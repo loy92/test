@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PBR参数显示调试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .pbr-display {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .pbr-item {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .progress-bar {
+            width: 200px;
+            height: 20px;
+            background: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 PBR参数显示调试工具</h1>
+        <p>用于测试和调试PBR材质参数的显示问题</p>
+
+        <!-- API连接测试 -->
+        <div class="test-section">
+            <h3>📡 API连接测试</h3>
+            <button class="button" onclick="testAPIConnection()">测试API连接</button>
+            <div id="api-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- PBR参数显示测试 -->
+        <div class="test-section">
+            <h3>🎯 PBR参数显示测试</h3>
+            <button class="button" onclick="testPBRDisplay()">显示测试参数</button>
+            <button class="button" onclick="clearPBRDisplay()">清除显示</button>
+            
+            <div id="pbr-display" style="display: none;">
+                <div class="pbr-display">
+                    <h4>PBR材质参数</h4>
+                    <div class="pbr-item">
+                        <span>金属度 (Metallic):</span>
+                        <div>
+                            <span id="metallic-value">0%</span>
+                            <div class="progress-bar">
+                                <div id="metallic-bar" class="progress-fill" style="background: #ffd700; width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pbr-item">
+                        <span>粗糙度 (Roughness):</span>
+                        <div>
+                            <span id="roughness-value">0%</span>
+                            <div class="progress-bar">
+                                <div id="roughness-bar" class="progress-fill" style="background: #cd853f; width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pbr-item">
+                        <span>透明度 (Transparency):</span>
+                        <div>
+                            <span id="transparency-value">0%</span>
+                            <div class="progress-bar">
+                                <div id="transparency-bar" class="progress-fill" style="background: #87ceeb; width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pbr-item">
+                        <span>凹凸强度 (Normal):</span>
+                        <div>
+                            <span id="normal-value">0%</span>
+                            <div class="progress-bar">
+                                <div id="normal-bar" class="progress-fill" style="background: #722ed1; width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pbr-item">
+                        <span>置信度:</span>
+                        <span id="confidence-value">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 实际API测试 -->
+        <div class="test-section">
+            <h3>🧪 实际API分析测试</h3>
+            <p>使用一个测试图像调用真实的API：</p>
+            <button class="button" onclick="testRealAnalysis()">测试真实分析</button>
+            <div id="real-analysis-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- 诊断信息 -->
+        <div class="test-section">
+            <h3>🔍 系统诊断</h3>
+            <button class="button" onclick="runDiagnostics()">运行诊断</button>
+            <div id="diagnostics-result" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        async function testAPIConnection() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '正在测试API连接...';
+
+            try {
+                const response = await fetch('http://localhost:5001/');
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <strong>✅ API连接成功</strong><br>
+                        状态: ${data.status}<br>
+                        设备: ${data.device}<br>
+                        版本: ${data.version}
+                    `;
+                } else {
+                    resultDiv.innerHTML = '❌ API连接失败：响应状态 ' + response.status;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '❌ API连接失败：' + error.message;
+            }
+        }
+
+        function testPBRDisplay() {
+            // 显示测试参数
+            const testData = {
+                metallic: 0.75,
+                roughness: 0.25,
+                transparency: 0.1,
+                normalStrength: 0.6,
+                confidence: 0.85
+            };
+
+            updatePBRDisplay(testData);
+            document.getElementById('pbr-display').style.display = 'block';
+        }
+
+        function clearPBRDisplay() {
+            document.getElementById('pbr-display').style.display = 'none';
+        }
+
+        function updatePBRDisplay(data) {
+            // 更新数值显示
+            document.getElementById('metallic-value').textContent = (data.metallic * 100).toFixed(1) + '%';
+            document.getElementById('roughness-value').textContent = (data.roughness * 100).toFixed(1) + '%';
+            document.getElementById('transparency-value').textContent = (data.transparency * 100).toFixed(1) + '%';
+            document.getElementById('normal-value').textContent = (data.normalStrength * 100).toFixed(1) + '%';
+            document.getElementById('confidence-value').textContent = (data.confidence * 100).toFixed(1) + '%';
+
+            // 更新进度条
+            document.getElementById('metallic-bar').style.width = (data.metallic * 100) + '%';
+            document.getElementById('roughness-bar').style.width = (data.roughness * 100) + '%';
+            document.getElementById('transparency-bar').style.width = (data.transparency * 100) + '%';
+            document.getElementById('normal-bar').style.width = (data.normalStrength * 100) + '%';
+        }
+
+        async function testRealAnalysis() {
+            const resultDiv = document.getElementById('real-analysis-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '正在调用API进行分析...';
+
+            // 创建一个简单的测试图像（1x1像素的PNG）
+            const testImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+
+            try {
+                const response = await fetch('http://localhost:5001/api/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        image: testImage,
+                        settings: {}
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('API响应:', data);
+                    
+                    if (data.success && data.results) {
+                        resultDiv.innerHTML = `
+                            <strong>✅ 分析成功</strong><br>
+                            金属度: ${(data.results.metallic * 100).toFixed(1)}%<br>
+                            粗糙度: ${(data.results.roughness * 100).toFixed(1)}%<br>
+                            透明度: ${(data.results.transparency * 100).toFixed(1)}%<br>
+                            凹凸强度: ${(data.results.normalStrength * 100).toFixed(1)}%<br>
+                            置信度: ${(data.results.confidence * 100).toFixed(1)}%<br>
+                            基础颜色: [${data.results.base_color.join(', ')}]<br>
+                            <br><strong>完整响应:</strong><br>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        `;
+                        
+                        // 在PBR显示区域显示结果
+                        updatePBRDisplay(data.results);
+                        document.getElementById('pbr-display').style.display = 'block';
+                    } else {
+                        resultDiv.innerHTML = '❌ API返回格式错误: ' + JSON.stringify(data);
+                    }
+                } else {
+                    resultDiv.innerHTML = '❌ API请求失败：状态 ' + response.status;
+                }
+            } catch (error) {
+                console.error('分析失败:', error);
+                resultDiv.innerHTML = '❌ 分析失败：' + error.message;
+            }
+        }
+
+        async function runDiagnostics() {
+            const resultDiv = document.getElementById('diagnostics-result');
+            resultDiv.style.display = 'block';
+            
+            let diagnostics = '<strong>🔍 系统诊断结果:</strong><br><br>';
+            
+            // 检查浏览器支持
+            diagnostics += '<strong>浏览器支持:</strong><br>';
+            diagnostics += `User Agent: ${navigator.userAgent}<br>`;
+            diagnostics += `Fetch API: ${typeof fetch !== 'undefined' ? '✅' : '❌'}<br>`;
+            diagnostics += `JSON支持: ${typeof JSON !== 'undefined' ? '✅' : '❌'}<br><br>`;
+            
+            // 检查网络连接
+            diagnostics += '<strong>网络连接:</strong><br>';
+            try {
+                const apiResponse = await fetch('http://localhost:5001/', { method: 'GET' });
+                diagnostics += `API服务器 (5001): ${apiResponse.ok ? '✅ 连接正常' : '❌ 连接失败'}<br>`;
+            } catch (e) {
+                diagnostics += `API服务器 (5001): ❌ 连接失败 (${e.message})<br>`;
+            }
+            
+            try {
+                const webResponse = await fetch('http://localhost:8081/', { method: 'GET' });
+                diagnostics += `Web服务器 (8081): ${webResponse.ok ? '✅ 连接正常' : '❌ 连接失败'}<br>`;
+            } catch (e) {
+                diagnostics += `Web服务器 (8081): ❌ 连接失败 (${e.message})<br>`;
+            }
+            
+            // 控制台错误检查
+            diagnostics += '<br><strong>建议:</strong><br>';
+            diagnostics += '1. 确保API服务器在端口5001运行<br>';
+            diagnostics += '2. 确保Web服务器在端口8081运行<br>';
+            diagnostics += '3. 检查浏览器控制台是否有JavaScript错误<br>';
+            diagnostics += '4. 尝试刷新页面<br>';
+            
+            resultDiv.innerHTML = diagnostics;
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PBR材质识别系统 - 支持批量处理</title>
+    
+    <!-- 引入 Atomm UI 样式 -->
+    <link rel="stylesheet" href="https://minio-download.makeblock.com/resource/atomm-ui-umd/dist-browser/atomm-ui.css">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .mode-selector {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mode-tabs {
+            display: inline-flex;
+            background: #f0f0f0;
+            border-radius: 8px;
+            padding: 4px;
+        }
+        
+        .mode-tab {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .mode-tab.active {
+            background: #1890ff;
+            color: white;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .single-mode .main-content {
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .batch-mode .main-content {
+            grid-template-columns: 1fr;
+        }
+        
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .panel h3 {
+            margin: 0 0 20px 0;
+            color: #2c3e50;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .upload-area {
+            border: 2px dashed #bdc3c7;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        .upload-area:hover {
+            border-color: #3498db;
+            background: #e3f2fd;
+        }
+        
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .batch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .batch-item {
+            position: relative;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .batch-item img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+        }
+        
+        .batch-item .remove-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .pbr-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .pbr-item {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .pbr-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .pbr-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .batch-results {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .batch-result-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .batch-result-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-right: 15px;
+        }
+        
+        .result-data {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            font-size: 12px;
+        }
+        
+        .debug-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .status-ok { background: #d4edda; color: #155724; padding: 10px; border-radius: 6px; margin: 10px 0; }
+        .status-error { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 6px; margin: 10px 0; }
+        .status-warning { background: #fff3cd; color: #856404; padding: 10px; border-radius: 6px; margin: 10px 0; }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .btn-primary { background: #1890ff; color: white; }
+        .btn-success { background: #52c41a; color: white; }
+        .btn-danger { background: #f44336; color: white; }
+        .btn-warning { background: #fa8c16; color: white; }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 PBR材质识别系统</h1>
+        <p>支持单张和批量图片的PBR参数识别</p>
+    </div>
+    
+    <div class="container" id="app" :class="isBatchMode ? 'batch-mode' : 'single-mode'">
+        <!-- 模式选择器 -->
+        <div class="mode-selector">
+            <div class="mode-tabs">
+                <button class="mode-tab" 
+                        :class="{ active: !isBatchMode }"
+                        @click="switchMode(false)">
+                    📸 单张识别
+                </button>
+                <button class="mode-tab" 
+                        :class="{ active: isBatchMode }"
+                        @click="switchMode(true)">
+                    📚 批量识别
+                </button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- 单张模式 -->
+            <div v-if="!isBatchMode" class="panel">
+                <h3>📸 单张图片识别</h3>
+                
+                <div class="upload-area" @click="triggerSingleFileInput">
+                    <div v-if="!selectedImage">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">📁</div>
+                        <h4>点击上传图片</h4>
+                        <p>支持 JPG, PNG, WebP 格式</p>
+                    </div>
+                    
+                    <div v-else>
+                        <img :src="selectedImage" alt="预览图片" class="image-preview">
+                        <p>点击重新选择图片</p>
+                    </div>
+                </div>
+                
+                <input type="file" 
+                       ref="singleFileInput" 
+                       @change="handleSingleFileSelect"
+                       accept="image/*" 
+                       style="display: none;">
+                
+                <!-- 单张状态显示 -->
+                <div style="margin-top: 20px;">
+                    <div :class="isAnalyzing ? 'status-warning' : 'status-ok'">
+                        <strong>分析状态:</strong> {{ isAnalyzing ? '🔄 分析中...' : '✅ 就绪' }}
+                    </div>
+                    
+                    <div v-if="selectedImage" style="margin-top: 15px;">
+                        <button @click="startSingleAnalysis" 
+                                :disabled="isAnalyzing"
+                                class="btn btn-primary"
+                                style="width: 100%;">
+                            {{ isAnalyzing ? '🔄 分析中，请稍候...' : '🔍 开始分析材质' }}
+                        </button>
+                    </div>
+                    
+                    <button @click="forceReset" class="btn btn-danger" style="width: 100%;">
+                        🚨 强制重置状态
+                    </button>
+                </div>
+            </div>
+
+            <!-- 批量模式 -->
+            <div v-if="isBatchMode" class="panel">
+                <h3>📚 批量图片识别</h3>
+                
+                <div class="upload-area" @click="triggerBatchFileInput">
+                    <div style="font-size: 3rem; margin-bottom: 15px;">📁</div>
+                    <h4>点击选择多张图片</h4>
+                    <p>支持 JPG, PNG, WebP 格式，可同时选择多张</p>
+                </div>
+                
+                <input type="file" 
+                       ref="batchFileInput" 
+                       @change="handleBatchFileSelect"
+                       accept="image/*" 
+                       multiple
+                       style="display: none;">
+                
+                <!-- 批量图片预览 -->
+                <div v-if="selectedImages.length > 0">
+                    <h4>已选择图片 ({{ selectedImages.length }}张)</h4>
+                    <div class="batch-grid">
+                        <div v-for="(image, index) in selectedImages" :key="index" class="batch-item">
+                            <img :src="image.preview" :alt="image.name">
+                            <button class="remove-btn" @click="removeImage(index)">×</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 批量操作按钮 -->
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button @click="startBatchAnalysis" 
+                                :disabled="isBatchAnalyzing"
+                                class="btn btn-primary">
+                            {{ isBatchAnalyzing ? `🔄 分析中 (${batchProgress}/${selectedImages.length})` : '🚀 开始批量分析' }}
+                        </button>
+                        
+                        <button @click="clearAllImages" 
+                                :disabled="isBatchAnalyzing"
+                                class="btn btn-warning">
+                            🗑️ 清空所有图片
+                        </button>
+                        
+                        <button v-if="batchResults.length > 0"
+                                @click="exportBatchResults" 
+                                class="btn btn-success">
+                            📊 导出结果
+                        </button>
+                    </div>
+                    
+                    <!-- 批量进度 -->
+                    <div v-if="isBatchAnalyzing" class="status-warning">
+                        <strong>批量分析进度:</strong> {{ batchProgress }}/{{ selectedImages.length }} 
+                        ({{ Math.round(batchProgress / selectedImages.length * 100) }}%)
+                    </div>
+                </div>
+                
+                <!-- 批量结果显示 -->
+                <div v-if="batchResults.length > 0">
+                    <h4>📊 批量分析结果 ({{ batchResults.length }}张)</h4>
+                    <div class="batch-results">
+                        <div v-for="(result, index) in batchResults" :key="index" class="batch-result-item">
+                            <img :src="result.image" :alt="result.name">
+                            <div class="result-data">
+                                <div>
+                                    <strong>金属度</strong><br>
+                                    {{ (result.metallic * 100).toFixed(1) }}%
+                                </div>
+                                <div>
+                                    <strong>粗糙度</strong><br>
+                                    {{ (result.roughness * 100).toFixed(1) }}%
+                                </div>
+                                <div>
+                                    <strong>透明度</strong><br>
+                                    {{ (result.transparency * 100).toFixed(1) }}%
+                                </div>
+                                <div>
+                                    <strong>置信度</strong><br>
+                                    {{ (result.confidence * 100).toFixed(1) }}%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PBR参数显示面板（单张模式时显示） -->
+            <div v-if="!isBatchMode" class="panel">
+                <h3>⚙️ PBR材质参数</h3>
+                
+                <div v-if="pbrResults" style="border: 2px solid #4CAF50; padding: 15px; border-radius: 8px; background: #f8fff8;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                        <p style="color: #4CAF50; font-weight: bold; margin: 0;">✅ PBR参数已识别</p>
+                        <small style="color: #666;">{{ new Date().toLocaleTimeString() }}</small>
+                    </div>
+                    
+                    <div class="pbr-grid">
+                        <div class="pbr-item">
+                            <div class="pbr-label">金属度 (Metallic)</div>
+                            <div class="pbr-value">{{ ((pbrResults.metallic || 0) * 100).toFixed(1) }}%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" 
+                                     :style="{ width: ((pbrResults.metallic || 0) * 100) + '%', background: '#52c41a' }">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pbr-item">
+                            <div class="pbr-label">粗糙度 (Roughness)</div>
+                            <div class="pbr-value">{{ ((pbrResults.roughness || 0) * 100).toFixed(1) }}%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" 
+                                     :style="{ width: ((pbrResults.roughness || 0) * 100) + '%', background: '#1890ff' }">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pbr-item">
+                            <div class="pbr-label">透明度 (Transparency)</div>
+                            <div class="pbr-value">{{ ((pbrResults.transparency || 0) * 100).toFixed(1) }}%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" 
+                                     :style="{ width: ((pbrResults.transparency || 0) * 100) + '%', background: '#fa8c16' }">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pbr-item">
+                            <div class="pbr-label">置信度 (Confidence)</div>
+                            <div class="pbr-value">{{ ((pbrResults.confidence || 0) * 100).toFixed(1) }}%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" 
+                                     :style="{ width: ((pbrResults.confidence || 0) * 100) + '%', background: '#eb2f96' }">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 15px; padding: 12px; background: rgba(24, 144, 255, 0.1); border-radius: 8px;">
+                        <p style="margin: 0; color: #1890ff; font-weight: 500;">
+                            🎨 预测材质类型: {{ pbrResults.material_type || '抛光金属' }}
+                        </p>
+                    </div>
+                </div>
+                
+                <div v-else style="text-align: center; padding: 40px; color: #999;">
+                    <div style="font-size: 1.1rem;">
+                        🎯 上传图片开始分析
+                    </div>
+                    <p style="margin-top: 8px;">
+                        AI将自动识别材质的物理属性
+                    </p>
+                </div>
+                
+                <!-- 调试信息 -->
+                <div class="debug-info">
+                    <h4>🔍 调试信息</h4>
+                    <p><strong>模式:</strong> {{ isBatchMode ? '批量模式' : '单张模式' }}</p>
+                    <p><strong>isAnalyzing:</strong> {{ isAnalyzing }}</p>
+                    <p><strong>isBatchAnalyzing:</strong> {{ isBatchAnalyzing }}</p>
+                    <p><strong>selectedImage:</strong> {{ selectedImage ? 'exists' : 'null' }}</p>
+                    <p><strong>selectedImages:</strong> {{ selectedImages.length }}</p>
+                    <p><strong>pbrResults:</strong> {{ pbrResults ? 'exists' : 'null' }}</p>
+                    <p><strong>batchResults:</strong> {{ batchResults.length }}</p>
+                    <p><strong>组件挂载:</strong> {{ mounted ? 'yes' : 'no' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入 Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    // 核心状态 - 明确初始化
+                    isAnalyzing: false,           // 单张分析状态
+                    selectedImage: null,          // 选中的图片
+                    pbrResults: null,             // 单张PBR结果
+                    mounted: false,               // 挂载状态
+                    
+                    // 批量处理状态
+                    isBatchMode: false,           // 批量模式
+                    isBatchAnalyzing: false,      // 批量分析状态
+                    selectedImages: [],           // 批量选择的图片
+                    batchProgress: 0,             // 批量进度
+                    batchResults: []              // 批量结果
+                };
+            },
+            
+            methods: {
+                // 切换模式
+                switchMode(batchMode) {
+                    this.isBatchMode = batchMode;
+                    this.forceReset();
+                    console.log('🔄 切换到', batchMode ? '批量模式' : '单张模式');
+                },
+                
+                // 触发单张文件选择
+                triggerSingleFileInput() {
+                    this.$refs.singleFileInput.click();
+                },
+                
+                // 触发批量文件选择
+                triggerBatchFileInput() {
+                    this.$refs.batchFileInput.click();
+                },
+                
+                // 处理单张文件选择
+                handleSingleFileSelect(event) {
+                    const file = event.target.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.selectedImage = e.target.result;
+                            console.log('✅ 单张图片已选择');
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        alert('请选择有效的图片文件');
+                    }
+                },
+                
+                // 处理批量文件选择
+                handleBatchFileSelect(event) {
+                    const files = Array.from(event.target.files);
+                    
+                    files.forEach(file => {
+                        if (file.type.startsWith('image/')) {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                this.selectedImages.push({
+                                    name: file.name,
+                                    file: file,
+                                    preview: e.target.result
+                                });
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                    
+                    console.log(`✅ 批量选择了 ${files.length} 张图片`);
+                },
+                
+                // 移除单张图片
+                removeImage(index) {
+                    this.selectedImages.splice(index, 1);
+                    console.log(`🗑️ 移除了第 ${index + 1} 张图片`);
+                },
+                
+                // 清空所有图片
+                clearAllImages() {
+                    this.selectedImages = [];
+                    this.batchResults = [];
+                    this.batchProgress = 0;
+                    console.log('🗑️ 清空了所有图片');
+                },
+                
+                // 开始单张分析
+                async startSingleAnalysis() {
+                    if (!this.selectedImage) {
+                        alert('请先选择图片');
+                        return;
+                    }
+                    
+                    console.log('🔄 开始单张分析，设置isAnalyzing = true');
+                    this.isAnalyzing = true;
+                    
+                    try {
+                        // 模拟API调用延迟
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        
+                        // 模拟成功结果
+                        const mockResult = {
+                            metallic: Math.random() * 0.8 + 0.1,
+                            roughness: Math.random() * 0.6 + 0.2,
+                            transparency: Math.random() * 0.3,
+                            confidence: Math.random() * 0.3 + 0.7,
+                            material_type: ['抛光金属', '粗糙塑料', '光滑玻璃', '磨砂金属'][Math.floor(Math.random() * 4)],
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        this.pbrResults = mockResult;
+                        console.log('✅ 单张分析完成，设置isAnalyzing = false');
+                        
+                    } catch (error) {
+                        console.error('❌ 单张分析出错:', error);
+                        alert('分析失败: ' + error.message);
+                    } finally {
+                        this.isAnalyzing = false;
+                        console.log('🏁 单张分析finally: isAnalyzing = false');
+                    }
+                },
+                
+                // 开始批量分析
+                async startBatchAnalysis() {
+                    if (this.selectedImages.length === 0) {
+                        alert('请先选择图片');
+                        return;
+                    }
+                    
+                    console.log(`🚀 开始批量分析 ${this.selectedImages.length} 张图片`);
+                    this.isBatchAnalyzing = true;
+                    this.batchProgress = 0;
+                    this.batchResults = [];
+                    
+                    try {
+                        for (let i = 0; i < this.selectedImages.length; i++) {
+                            const image = this.selectedImages[i];
+                            console.log(`🔄 分析第 ${i + 1} 张图片: ${image.name}`);
+                            
+                            // 模拟API调用延迟
+                            await new Promise(resolve => setTimeout(resolve, 1500));
+                            
+                            // 模拟分析结果
+                            const result = {
+                                name: image.name,
+                                image: image.preview,
+                                metallic: Math.random() * 0.8 + 0.1,
+                                roughness: Math.random() * 0.6 + 0.2,
+                                transparency: Math.random() * 0.3,
+                                confidence: Math.random() * 0.3 + 0.7,
+                                material_type: ['抛光金属', '粗糙塑料', '光滑玻璃', '磨砂金属'][Math.floor(Math.random() * 4)],
+                                timestamp: new Date().toISOString()
+                            };
+                            
+                            this.batchResults.push(result);
+                            this.batchProgress = i + 1;
+                            
+                            console.log(`✅ 第 ${i + 1} 张图片分析完成`);
+                        }
+                        
+                        console.log('🎉 批量分析全部完成！');
+                        
+                    } catch (error) {
+                        console.error('❌ 批量分析出错:', error);
+                        alert('批量分析失败: ' + error.message);
+                    } finally {
+                        this.isBatchAnalyzing = false;
+                        console.log('🏁 批量分析finally: isBatchAnalyzing = false');
+                    }
+                },
+                
+                // 导出批量结果
+                exportBatchResults() {
+                    const results = this.batchResults.map(result => ({
+                        图片名称: result.name,
+                        金属度: (result.metallic * 100).toFixed(1) + '%',
+                        粗糙度: (result.roughness * 100).toFixed(1) + '%',
+                        透明度: (result.transparency * 100).toFixed(1) + '%',
+                        置信度: (result.confidence * 100).toFixed(1) + '%',
+                        材质类型: result.material_type,
+                        分析时间: result.timestamp
+                    }));
+                    
+                    const csv = this.convertToCSV(results);
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `PBR分析结果_${new Date().toISOString().split('T')[0]}.csv`;
+                    link.click();
+                    
+                    console.log('📊 批量结果已导出为CSV文件');
+                },
+                
+                // 转换为CSV格式
+                convertToCSV(data) {
+                    if (data.length === 0) return '';
+                    
+                    const headers = Object.keys(data[0]);
+                    const csv = [
+                        headers.join(','),
+                        ...data.map(row => headers.map(header => `"${row[header]}"`).join(','))
+                    ].join('\n');
+                    
+                    return '\ufeff' + csv; // 添加BOM以确保Excel正确显示中文
+                },
+                
+                // 强制重置状态
+                forceReset() {
+                    console.log('🚨 强制重置所有状态');
+                    this.isAnalyzing = false;
+                    this.isBatchAnalyzing = false;
+                    this.selectedImage = null;
+                    this.selectedImages = [];
+                    this.pbrResults = null;
+                    this.batchResults = [];
+                    this.batchProgress = 0;
+                    alert('✅ 状态已强制重置！');
+                },
+                
+                // 自动加载测试数据
+                loadTestData() {
+                    console.log('📊 自动加载测试数据');
+                    
+                    // 确保不处于分析状态
+                    this.isAnalyzing = false;
+                    this.isBatchAnalyzing = false;
+                    
+                    const testData = {
+                        metallic: 0.75,
+                        roughness: 0.25,
+                        transparency: 0.1,
+                        confidence: 0.85,
+                        material_type: '抛光金属',
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    this.pbrResults = testData;
+                    console.log('✅ 测试数据加载完成');
+                }
+            },
+            
+            // 组件挂载时
+            mounted() {
+                console.log('🚀 Vue组件已挂载');
+                this.mounted = true;
+                
+                // 强制确保分析状态为false
+                this.isAnalyzing = false;
+                this.isBatchAnalyzing = false;
+                
+                // 延迟自动加载测试数据（仅在单张模式）
+                setTimeout(() => {
+                    if (!this.isBatchMode) {
+                        this.loadTestData();
+                    }
+                }, 1000);
+                
+                console.log('✅ 初始化完成，isAnalyzing =', this.isAnalyzing, ', isBatchAnalyzing =', this.isBatchAnalyzing);
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

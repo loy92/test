@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>状态诊断页面</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; }
+        .status-item { margin: 10px 0; padding: 10px; border-radius: 6px; }
+        .true { background: #ffebee; border-left: 4px solid #f44336; }
+        .false { background: #e8f5e8; border-left: 4px solid #4caf50; }
+        .debug-section { margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <h1>🔍 Vue状态诊断</h1>
+        
+        <div class="debug-section">
+            <h3>📊 当前状态</h3>
+            <div :class="['status-item', isAnalyzing ? 'true' : 'false']">
+                <strong>isAnalyzing:</strong> {{ isAnalyzing }}
+                {{ isAnalyzing ? '⚠️ 这就是为什么显示"分析中"' : '✅ 正常' }}
+            </div>
+            
+            <div :class="['status-item', isBatchAnalyzing ? 'true' : 'false']">
+                <strong>isBatchAnalyzing:</strong> {{ isBatchAnalyzing }}
+                {{ isBatchAnalyzing ? '⚠️ 批量分析状态异常' : '✅ 正常' }}
+            </div>
+            
+            <div :class="['status-item', selectedImage ? 'true' : 'false']">
+                <strong>selectedImage:</strong> {{ selectedImage ? '有图片' : '无图片' }}
+            </div>
+            
+            <div :class="['status-item', isBatchMode ? 'true' : 'false']">
+                <strong>isBatchMode:</strong> {{ isBatchMode }}
+            </div>
+            
+            <div :class="['status-item', pbrResults ? 'true' : 'false']">
+                <strong>pbrResults:</strong> {{ pbrResults ? '有数据' : '无数据' }}
+            </div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>🔧 问题诊断</h3>
+            <div v-if="isAnalyzing || isBatchAnalyzing">
+                <p style="color: #f44336; font-weight: bold;">
+                    ❌ 发现问题：分析状态异常为true！
+                </p>
+                <button @click="resetAnalyzingState" style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                    🔄 重置分析状态
+                </button>
+            </div>
+            <div v-else>
+                <p style="color: #4caf50; font-weight: bold;">
+                    ✅ 分析状态正常
+                </p>
+            </div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>🧪 测试操作</h3>
+            <button @click="loadTestData" style="padding: 10px 20px; background: #1890ff; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 10px;">
+                📊 加载测试数据
+            </button>
+            
+            <button @click="clearAllData" style="padding: 10px 20px; background: #ff9800; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                🗑️ 清除所有数据
+            </button>
+        </div>
+        
+        <div class="debug-section">
+            <h3>📝 完整状态JSON</h3>
+            <pre style="background: #f1f1f1; padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 12px;">{{ JSON.stringify({
+                isAnalyzing,
+                isBatchAnalyzing,
+                selectedImage: selectedImage ? 'exists' : null,
+                isBatchMode,
+                pbrResults: pbrResults ? 'exists' : null,
+                selectedImages: selectedImages.length,
+                batchProgress,
+                batchResults: batchResults.length
+            }, null, 2) }}</pre>
+        </div>
+        
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="/" style="color: #1890ff; text-decoration: none;">← 返回主界面</a>
+        </div>
+    </div>
+
+    <!-- 引入 Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    // 单张图片模式
+                    selectedImage: null,
+                    isDragging: false,
+                    isAnalyzing: false,
+                    pbrResults: null,
+                    
+                    // 批量处理模式
+                    isBatchMode: false,
+                    selectedImages: [],
+                    isBatchAnalyzing: false,
+                    batchProgress: 0,
+                    batchResults: []
+                };
+            },
+            
+            methods: {
+                resetAnalyzingState() {
+                    this.isAnalyzing = false;
+                    this.isBatchAnalyzing = false;
+                    console.log('✅ 分析状态已重置');
+                },
+                
+                loadTestData() {
+                    const testData = {
+                        metallic: 0.75,
+                        roughness: 0.25,
+                        transparency: 0.1,
+                        confidence: 0.85,
+                        base_color: [255, 215, 0],
+                        timestamp: new Date().toISOString(),
+                        material_type: '抛光金属'
+                    };
+                    
+                    this.pbrResults = testData;
+                    console.log('✅ 测试数据已加载:', this.pbrResults);
+                },
+                
+                clearAllData() {
+                    this.selectedImage = null;
+                    this.pbrResults = null;
+                    this.selectedImages = [];
+                    this.batchResults = [];
+                    this.isAnalyzing = false;
+                    this.isBatchAnalyzing = false;
+                    this.batchProgress = 0;
+                    console.log('✅ 所有数据已清除');
+                }
+            },
+            
+            mounted() {
+                console.log('🚀 诊断页面已挂载');
+                
+                // 自动加载测试数据
+                setTimeout(() => {
+                    this.loadTestData();
+                }, 500);
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html> 

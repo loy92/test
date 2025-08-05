@@ -1,0 +1,67 @@
+{
+  "model": {
+    "pos_encoding_freqs": 10,
+    "dir_encoding_freqs": 4,
+    "density_layers": 8,
+    "density_hidden_dim": 256,
+    "pbr_layers": 4,
+    "pbr_hidden_dim": 128,
+    "skip_connections": [4],
+    "use_viewdirs": true,
+    "deformation_layers": 6,
+    "deformation_hidden_dim": 128
+  },
+  
+  "data": {
+    "data_dir": "data/pbr_dataset",
+    "batch_size": 4,
+    "num_workers": 4,
+    "image_scale": 4,
+    "use_deformation": true,
+    "near": 0.1,
+    "far": 10.0
+  },
+  
+  "training": {
+    "output_dir": "experiments/pbr_nerf_experiment",
+    "num_epochs": 200,
+    "optimizer": {
+      "type": "adam",
+      "lr": 0.0001,
+      "weight_decay": 0.0,
+      "betas": [0.9, 0.999]
+    },
+    "scheduler": {
+      "type": "exponential",
+      "gamma": 0.98
+    },
+    "max_grad_norm": 1.0,
+    "log_interval": 100,
+    "val_interval": 10,
+    "save_interval": 50,
+    "use_amp": false
+  },
+  
+  "loss": {
+    "rgb_weight": 1.0,
+    "metallic_weight": 0.5,
+    "roughness_weight": 0.5,
+    "transparency_weight": 0.3,
+    "normal_weight": 0.7,
+    "density_weight": 0.1
+  },
+  
+  "rendering": {
+    "num_coarse_samples": 64,
+    "num_fine_samples": 128,
+    "use_hierarchical_sampling": true,
+    "perturb": true,
+    "raw_noise_std": 1.0
+  },
+  
+  "validation": {
+    "render_interval": 20,
+    "render_test_views": 5,
+    "compute_metrics": ["psnr", "ssim", "lpips"]
+  }
+} 

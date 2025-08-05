@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>功能验证测试页面</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-item { margin: 15px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .fail { background: #f8d7da; border-color: #f5c6cb; }
+        .pending { background: #fff3cd; border-color: #ffeaa7; }
+    </style>
+</head>
+<body>
+    <h1>🧪 PBR系统功能验证</h1>
+    
+    <div id="test-results">
+        <div class="test-item pending">
+            <h3>✅ 1. Web服务器连接测试</h3>
+            <p>状态: <span id="web-status">检测中...</span></p>
+        </div>
+        
+        <div class="test-item pending">
+            <h3>✅ 2. API服务器连接测试</h3>
+            <p>状态: <span id="api-status">检测中...</span></p>
+        </div>
+        
+        <div class="test-item pending">
+            <h3>🔄 3. 主页面功能检测</h3>
+            <p>状态: <span id="main-page-status">检测中...</span></p>
+            <a href="/" target="_blank">打开主页面</a>
+        </div>
+    </div>
+    
+    <div style="margin-top: 30px; padding: 20px; background: #e6f3ff; border-radius: 8px;">
+        <h3>📋 功能检查清单</h3>
+        <p><strong>请在主页面验证以下功能：</strong></p>
+        <ul>
+            <li>🖼️ 能否看到"单张图片"和"📚 批量处理"切换按钮？</li>
+            <li>📊 点击"显示测试数据"是否自动显示PBR参数？</li>
+            <li>📚 切换到批量模式是否显示多文件上传界面？</li>
+            <li>⚙️ PBR参数是否只显示：金属度、粗糙度、透明度（没有凹凸强度）？</li>
+        </ul>
+    </div>
+
+    <script>
+        // 测试Web服务器
+        document.getElementById('web-status').textContent = '✅ 已连接（您正在查看此页面）';
+        document.querySelector('#test-results .test-item:first-child').className = 'test-item success';
+        
+        // 测试API服务器
+        fetch('http://localhost:5001/api/health')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('api-status').textContent = '✅ API服务器正常 - ' + data.status;
+                document.querySelector('#test-results .test-item:nth-child(2)').className = 'test-item success';
+            })
+            .catch(error => {
+                document.getElementById('api-status').textContent = '❌ API服务器连接失败 - ' + error.message;
+                document.querySelector('#test-results .test-item:nth-child(2)').className = 'test-item fail';
+            });
+        
+        // 检查主页面
+        setTimeout(() => {
+            document.getElementById('main-page-status').textContent = '📋 请手动检查主页面功能（点击上方链接）';
+            document.querySelector('#test-results .test-item:nth-child(3)').className = 'test-item pending';
+        }, 1000);
+    </script>
+</body>
+</html> 

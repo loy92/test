@@ -1,0 +1,84 @@
+INFO:analysis.pbr_analyzer:PBR分析器初始化完成，使用设备: cpu
+INFO:__main__:✅ 已加载基础PBR分析器
+INFO:__main__:创建默认PBR模型，使用设备: cpu
+分析器状态: 优化=False, 基础=True, 简化=True
+启动PBR材质识别系统API服务器...
+使用设备: cpu
+模型状态: 已加载
+尝试在端口 5001 启动服务器...
+ * Serving Flask app 'app'
+ * Debug mode: off
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.10.41.83:5001
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:09:48] "GET /api/health HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:10:31] "OPTIONS /api/analyze HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+/Users/ithppc02088/Library/Python/3.9/lib/python/site-packages/skimage/feature/texture.py:360: UserWarning: Applying `local_binary_pattern` to floating-point images may give unexpected results when small numerical differences between adjacent pixels are present. It is recommended to use this function with images of integer dtype.
+  warnings.warn(
+INFO:__main__:分析结果: metallic=0.551, roughness=0.342, confidence=0.292
+INFO:__main__:PBR分析完成: {'metallic': 0.5507931431671758, 'roughness': 0.3420831646280731, 'transparency': 0.45678133094374457, 'normalStrength': 0.7233516769267053, 'confidence': 0.2917179487459924, 'base_color': [105, 106, 104], 'timestamp': '2025-08-04T18:10:34.071480', 'settings': {'numSamples': 64, 'renderQuality': 'balanced', 'enableDeformation': True, 'enableNormalMapping': True, 'useGPUAcceleration': True, 'exportFormat': 'json', 'includeVisualization': False}}
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:10:34] "POST /api/analyze HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:11:56] "OPTIONS /api/analyze HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+INFO:__main__:分析结果: metallic=0.327, roughness=0.360, confidence=0.256
+INFO:__main__:PBR分析完成: {'metallic': 0.32689229718258306, 'roughness': 0.35991089318936337, 'transparency': 0.23734601742494296, 'normalStrength': 0.6802381986752247, 'confidence': 0.2555129078985497, 'base_color': [172, 62, 65], 'timestamp': '2025-08-04T18:12:00.146379', 'settings': {'numSamples': 64, 'renderQuality': 'balanced', 'enableDeformation': True, 'enableNormalMapping': True, 'useGPUAcceleration': True, 'exportFormat': 'json', 'includeVisualization': False}}
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:12:00] "POST /api/analyze HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:13:20] "GET /api/health HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:13:35] "OPTIONS /api/analyze HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+INFO:__main__:分析结果: metallic=0.563, roughness=0.361, confidence=0.268
+INFO:__main__:PBR分析完成: {'metallic': 0.5627794250454374, 'roughness': 0.3611706280382379, 'transparency': 0.47575296561709923, 'normalStrength': 0.37443574102221794, 'confidence': 0.268382302263265, 'base_color': [133, 131, 128], 'timestamp': '2025-08-04T18:16:35.360866', 'settings': {'numSamples': 64, 'renderQuality': 'balanced', 'enableDeformation': True, 'enableNormalMapping': True, 'useGPUAcceleration': True, 'exportFormat': 'json', 'includeVisualization': False}}
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:16:35] "POST /api/analyze HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:16:42] "OPTIONS /api/analyze HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:16:49] "OPTIONS /api/analyze HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:17:21] "OPTIONS /api/analyze HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:18:18] "OPTIONS /api/analyze HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:23:55] "OPTIONS /api/analyze HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+INFO:__main__:分析结果: metallic=0.563, roughness=0.361, confidence=0.276
+INFO:__main__:PBR分析完成: {'metallic': 0.5627794250454374, 'roughness': 0.3611706280382379, 'transparency': 0.47575296561709923, 'normalStrength': 0.37443574102221794, 'confidence': 0.27555474778932165, 'base_color': [133, 131, 128], 'timestamp': '2025-08-04T18:24:02.350786', 'settings': {'numSamples': 64, 'renderQuality': 'balanced', 'enableDeformation': True, 'enableNormalMapping': True, 'useGPUAcceleration': True, 'exportFormat': 'json', 'includeVisualization': False}}
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:24:02] "POST /api/analyze HTTP/1.1" 200 -
+INFO:__main__:分析结果: metallic=0.563, roughness=0.361, confidence=0.289
+INFO:__main__:PBR分析完成: {'metallic': 0.5627794250454374, 'roughness': 0.3611706280382379, 'transparency': 0.47575296561709923, 'normalStrength': 0.37443574102221794, 'confidence': 0.28916264282183723, 'base_color': [133, 131, 128], 'timestamp': '2025-08-04T18:24:26.646091', 'settings': {'numSamples': 64, 'renderQuality': 'balanced', 'enableDeformation': True, 'enableNormalMapping': True, 'useGPUAcceleration': True, 'exportFormat': 'json', 'includeVisualization': False}}
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:24:26] "POST /api/analyze HTTP/1.1" 200 -
+INFO:__main__:分析结果: metallic=0.561, roughness=0.291, confidence=0.214
+INFO:__main__:PBR分析完成: {'metallic': 0.5614257070398535, 'roughness': 0.29143609776949353, 'transparency': 0.47859167741018444, 'normalStrength': 0.08841051846217132, 'confidence': 0.2138811627612794, 'base_color': [149, 142, 133], 'timestamp': '2025-08-04T18:25:11.784393', 'settings': {'numSamples': 64, 'renderQuality': 'balanced', 'enableDeformation': True, 'enableNormalMapping': True, 'useGPUAcceleration': True, 'exportFormat': 'json', 'includeVisualization': False}}
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:25:11] "POST /api/analyze HTTP/1.1" 200 -
+INFO:__main__:分析结果: metallic=0.561, roughness=0.291, confidence=0.208
+INFO:__main__:PBR分析完成: {'metallic': 0.5614257070398535, 'roughness': 0.29143609776949353, 'transparency': 0.47859167741018444, 'normalStrength': 0.08841051846217132, 'confidence': 0.20829972494310786, 'base_color': [149, 142, 133], 'timestamp': '2025-08-04T18:26:08.660269', 'settings': {'numSamples': 64, 'renderQuality': 'balanced', 'enableDeformation': True, 'enableNormalMapping': True, 'useGPUAcceleration': True, 'exportFormat': 'json', 'includeVisualization': False}}
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:26:08] "POST /api/analyze HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:26:11] "OPTIONS /api/analyze HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:28:30] "OPTIONS /api/analyze HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+INFO:__main__:分析结果: metallic=0.561, roughness=0.291, confidence=0.216
+INFO:__main__:PBR分析完成: {'metallic': 0.5614257070398535, 'roughness': 0.29143609776949353, 'transparency': 0.47859167741018444, 'normalStrength': 0.08841051846217132, 'confidence': 0.2161509570718339, 'base_color': [149, 142, 133], 'timestamp': '2025-08-04T18:29:34.933288', 'settings': {'numSamples': 64, 'renderQuality': 'balanced', 'enableDeformation': True, 'enableNormalMapping': True, 'useGPUAcceleration': True, 'exportFormat': 'json', 'includeVisualization': False}}
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:29:34] "POST /api/analyze HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:30:07] "OPTIONS /api/analyze HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+INFO:__main__:分析结果: metallic=0.561, roughness=0.291, confidence=0.217
+INFO:__main__:PBR分析完成: {'metallic': 0.5614257070398535, 'roughness': 0.29143609776949353, 'transparency': 0.47859167741018444, 'normalStrength': 0.08841051846217132, 'confidence': 0.21692684361630518, 'base_color': [149, 142, 133], 'timestamp': '2025-08-04T18:30:36.153297', 'settings': {}}
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:30:36] "POST /api/analyze HTTP/1.1" 200 -
+INFO:__main__:分析结果: metallic=0.563, roughness=0.361, confidence=0.284
+INFO:__main__:PBR分析完成: {'metallic': 0.5627794250454374, 'roughness': 0.3611706280382379, 'transparency': 0.47575296561709923, 'normalStrength': 0.37443574102221794, 'confidence': 0.28448891921147973, 'base_color': [133, 131, 128], 'timestamp': '2025-08-04T18:33:43.411083', 'settings': {}}
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:33:43] "POST /api/analyze HTTP/1.1" 200 -
+INFO:__main__:分析结果: metallic=0.561, roughness=0.291, confidence=0.213
+INFO:__main__:PBR分析完成: {'metallic': 0.5614257070398535, 'roughness': 0.29143609776949353, 'transparency': 0.47859167741018444, 'normalStrength': 0.08841051846217132, 'confidence': 0.2131842522566386, 'base_color': [149, 142, 133], 'timestamp': '2025-08-04T18:34:44.579497', 'settings': {}}
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:34:44] "POST /api/analyze HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:37:06] "OPTIONS /api/analyze HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:38:03] "OPTIONS /api/analyze HTTP/1.1" 200 -
+INFO:__main__:使用EnhancedPBRAnalyzer分析器
+INFO:__main__:分析结果: metallic=0.561, roughness=0.291, confidence=0.203
+INFO:__main__:PBR分析完成: {'metallic': 0.5614257070398535, 'roughness': 0.29143609776949353, 'transparency': 0.47859167741018444, 'normalStrength': 0.08841051846217132, 'confidence': 0.2031388160218567, 'base_color': [149, 142, 133], 'timestamp': '2025-08-04T18:41:04.319816', 'settings': {}}
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:41:04] "POST /api/analyze HTTP/1.1" 200 -
+INFO:__main__:分析结果: metallic=0.561, roughness=0.291, confidence=0.213
+INFO:__main__:PBR分析完成: {'metallic': 0.5614257070398535, 'roughness': 0.29143609776949353, 'transparency': 0.47859167741018444, 'normalStrength': 0.08841051846217132, 'confidence': 0.213089627372826, 'base_color': [149, 142, 133], 'timestamp': '2025-08-04T18:42:22.513663', 'settings': {}}
+INFO:werkzeug:127.0.0.1 - - [04/Aug/2025 18:42:22] "POST /api/analyze HTTP/1.1" 200 -

@@ -1,0 +1,8 @@
+::1 - - [04/Aug/2025 18:36:33] "GET / HTTP/1.1" 200 -
+::1 - - [04/Aug/2025 18:36:33] "GET /status_debug.html HTTP/1.1" 200 -
+::1 - - [04/Aug/2025 18:36:46] "GET / HTTP/1.1" 304 -
+::1 - - [04/Aug/2025 18:37:00] "GET / HTTP/1.1" 200 -
+::1 - - [04/Aug/2025 18:37:02] code 404, message File not found
+::1 - - [04/Aug/2025 18:37:02] "GET /favicon.ico HTTP/1.1" 404 -
+::1 - - [04/Aug/2025 18:40:21] "GET /simple_fixed.html HTTP/1.1" 200 -
+::1 - - [05/Aug/2025 10:31:05] "GET / HTTP/1.1" 200 -

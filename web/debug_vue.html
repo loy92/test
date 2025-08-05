@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue自动显示测试</title>
+    
+    <!-- 引入 Atomm UI 样式 -->
+    <link rel="stylesheet" href="https://minio-download.makeblock.com/resource/atomm-ui-umd/dist-browser/atomm-ui.css">
+    
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; }
+        .pbr-results { margin-top: 20px; padding: 20px; border: 2px solid #4CAF50; border-radius: 8px; background: #f8fff8; }
+        .debug-info { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; font-family: monospace; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <h1>🧪 Vue自动显示测试</h1>
+        
+        <div>
+            <p><strong>状态检查：</strong></p>
+            <ul>
+                <li>Vue应用已挂载: {{ mounted ? '✅' : '❌' }}</li>
+                <li>自动数据加载: {{ dataLoaded ? '✅' : '❌' }}</li>
+                <li>PBR结果存在: {{ pbrResults ? '✅' : '❌' }}</li>
+            </ul>
+        </div>
+        
+        <div v-if="pbrResults" class="pbr-results">
+            <h3>✅ PBR参数已自动显示</h3>
+            <p><strong>金属度:</strong> {{ ((pbrResults.metallic || 0) * 100).toFixed(1) }}%</p>
+            <p><strong>粗糙度:</strong> {{ ((pbrResults.roughness || 0) * 100).toFixed(1) }}%</p>
+            <p><strong>透明度:</strong> {{ ((pbrResults.transparency || 0) * 100).toFixed(1) }}%</p>
+            <p><strong>置信度:</strong> {{ ((pbrResults.confidence || 0) * 100).toFixed(1) }}%</p>
+        </div>
+        
+        <div v-else class="pbr-results" style="border-color: #ff4444; background: #fff8f8;">
+            <h3>❌ PBR参数未自动显示</h3>
+            <p>这表明自动加载功能有问题</p>
+        </div>
+        
+        <div class="debug-info">
+            <h4>🔍 调试信息</h4>
+            <p><strong>pbrResults:</strong> {{ JSON.stringify(pbrResults, null, 2) }}</p>
+            <p><strong>控制台日志:</strong> 请检查浏览器控制台(F12)查看错误信息</p>
+        </div>
+        
+        <div style="margin-top: 20px; text-align: center;">
+            <button @click="manualLoadData" style="padding: 10px 20px; background: #1890ff; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                🔄 手动加载测试数据
+            </button>
+        </div>
+        
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="/" style="color: #1890ff; text-decoration: none;">← 返回主界面</a>
+        </div>
+    </div>
+
+    <!-- 引入 Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    <!-- 引入 Atomm UI -->
+    <script src="https://minio-download.makeblock.com/resource/atomm-ui-umd/dist-browser/atomm-ui.js"></script>
+    
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    mounted: false,
+                    dataLoaded: false,
+                    pbrResults: null
+                };
+            },
+            
+            methods: {
+                loadTestData() {
+                    console.log('🔄 开始加载测试数据...');
+                    
+                    const testData = {
+                        metallic: 0.75,
+                        roughness: 0.25,
+                        transparency: 0.1,
+                        confidence: 0.85,
+                        base_color: [255, 215, 0],
+                        timestamp: new Date().toISOString(),
+                        settings: {}
+                    };
+                    
+                    this.pbrResults = testData;
+                    this.dataLoaded = true;
+                    
+                    console.log('✅ 测试数据加载完成:', this.pbrResults);
+                },
+                
+                manualLoadData() {
+                    this.loadTestData();
+                }
+            },
+            
+            mounted() {
+                console.log('🚀 Vue组件已挂载');
+                this.mounted = true;
+                
+                // 延迟加载数据确保DOM完全准备好
+                setTimeout(() => {
+                    this.loadTestData();
+                }, 100);
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html> 

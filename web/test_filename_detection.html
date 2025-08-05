@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件名材料识别测试</title>
+    
+    <!-- 引入 Atomm UI 样式 -->
+    <link rel="stylesheet" href="https://minio-download.makeblock.com/resource/atomm-ui-umd/dist-browser/atomm-ui.css">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #3498db;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(52, 152, 219, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #2980b9;
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        .result-item {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .filename {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .detected-material {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        
+        .pbr-values {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .pbr-value {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .btn-primary { background: #1890ff; color: white; }
+        .btn-success { background: #52c41a; color: white; }
+        
+        .status-ok { background: #d4edda; color: #155724; padding: 10px; border-radius: 6px; margin: 10px 0; }
+        .status-error { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 6px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 文件名材料识别测试</h1>
+        <p>测试系统是否能从文件名识别材料类型</p>
+    </div>
+    
+    <div class="container" id="app">
+        <div class="panel">
+            <h3>📁 上传测试图片</h3>
+            <p>请上传包含材料关键词的图片文件名，例如：</p>
+            <ul>
+                <li><code>metal_steel_surface.jpg</code> - 应该识别为金属类</li>
+                <li><code>plastic_rough_texture.png</code> - 应该识别为塑料类</li>
+                <li><code>wood_oak_grain.webp</code> - 应该识别为木材类</li>
+                <li><code>glass_clear_surface.jpg</code> - 应该识别为玻璃类</li>
+            </ul>
+            
+            <div class="upload-area" @click="triggerFileInput">
+                <div style="font-size: 3rem; margin-bottom: 15px;">📁</div>
+                <h4>点击选择测试图片</h4>
+                <p>支持 JPG, PNG, WebP 格式</p>
+            </div>
+            
+            <input type="file" 
+                   ref="fileInput" 
+                   @change="handleFileSelect"
+                   accept="image/*" 
+                   multiple
+                   style="display: none;">
+            
+            <div style="margin-top: 20px; text-align: center;">
+                <button @click="startAnalysis" 
+                        :disabled="isAnalyzing || selectedImages.length === 0"
+                        class="btn btn-primary">
+                    {{ isAnalyzing ? '🔄 分析中...' : '🚀 开始分析' }}
+                </button>
+                
+                <button @click="clearResults" 
+                        class="btn btn-success">
+                    🗑️ 清空结果
+                </button>
+            </div>
+        </div>
+        
+        <div v-if="results.length > 0" class="panel">
+            <h3>📊 分析结果</h3>
+            <div v-for="(result, index) in results" :key="index" class="result-item">
+                <div class="filename">{{ result.name }}</div>
+                
+                <div v-if="result.detected_material" class="detected-material">
+                    🎯 检测到材料: {{ result.detected_material }}
+                    <span v-if="result.auto_detected" style="margin-left: 10px; font-size: 12px;">
+                        (自动识别)
+                    </span>
+                </div>
+                
+                <div v-else class="status-error">
+                    ❌ 未能从文件名识别材料类型
+                </div>
+                
+                <div class="pbr-values">
+                    <div class="pbr-value">
+                        <strong>金属度</strong><br>
+                        {{ (result.metallic * 100).toFixed(1) }}%
+                    </div>
+                    <div class="pbr-value">
+                        <strong>粗糙度</strong><br>
+                        {{ (result.roughness * 100).toFixed(1) }}%
+                    </div>
+                    <div class="pbr-value">
+                        <strong>置信度</strong><br>
+                        {{ (result.confidence * 100).toFixed(1) }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入 Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    selectedImages: [],
+                    results: [],
+                    isAnalyzing: false
+                };
+            },
+            methods: {
+                triggerFileInput() {
+                    this.$refs.fileInput.click();
+                },
+                handleFileSelect(event) {
+                    const files = Array.from(event.target.files);
+                    this.selectedImages = [];
+                    
+                    files.forEach(file => {
+                        if (file.type.startsWith('image/')) {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                this.selectedImages.push({
+                                    name: file.name,
+                                    file: file,
+                                    preview: e.target.result
+                                });
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                },
+                async startAnalysis() {
+                    if (this.selectedImages.length === 0) {
+                        alert('请先选择图片');
+                        return;
+                    }
+                    
+                    this.isAnalyzing = true;
+                    this.results = [];
+                    
+                    for (let i = 0; i < this.selectedImages.length; i++) {
+                        const image = this.selectedImages[i];
+                        console.log(`分析图片: ${image.name}`);
+                        
+                        try {
+                            const base64 = image.preview.split(',')[1];
+                            const response = await fetch('http://localhost:5001/api/analyze/enhanced', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    image: base64,
+                                    filename: image.name
+                                })
+                            });
+                            
+                            if (response.ok) {
+                                const data = await response.json();
+                                if (data.success && data.results) {
+                                    const result = {
+                                        name: image.name,
+                                        metallic: data.results.metallic,
+                                        roughness: data.results.roughness,
+                                        confidence: data.results.confidence,
+                                        detected_material: data.results.detected_material || data.results.material_name || '',
+                                        auto_detected: data.results.auto_detected_from_filename || false
+                                    };
+                                    this.results.push(result);
+                                    console.log(`✅ 分析完成: ${result.detected_material}`);
+                                }
+                            } else {
+                                throw new Error(`API请求失败: ${response.status}`);
+                            }
+                        } catch (error) {
+                            console.error(`❌ 分析失败:`, error);
+                            this.results.push({
+                                name: image.name,
+                                metallic: 0,
+                                roughness: 0,
+                                confidence: 0,
+                                detected_material: '',
+                                auto_detected: false
+                            });
+                        }
+                    }
+                    
+                    this.isAnalyzing = false;
+                },
+                clearResults() {
+                    this.selectedImages = [];
+                    this.results = [];
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html> 

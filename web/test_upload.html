@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片上传测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .upload-area {
+            border: 2px dashed #3498db;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(52, 152, 219, 0.05);
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .upload-area:hover {
+            border-color: #2980b9;
+            background: rgba(52, 152, 219, 0.1);
+        }
+        .upload-area.dragover {
+            border-color: #27ae60;
+            background: rgba(39, 174, 96, 0.1);
+        }
+        .preview {
+            max-width: 300px;
+            margin-top: 20px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+        .status.error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <h1>图片上传测试</h1>
+    
+    <div class="upload-area" id="uploadArea">
+        <h3>点击或拖拽图片到此处</h3>
+        <p>支持 JPG, PNG, GIF 格式</p>
+    </div>
+    
+    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+    
+    <div id="status"></div>
+    <div id="preview"></div>
+    
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const statusDiv = document.getElementById('status');
+        const previewDiv = document.getElementById('preview');
+        
+        function showStatus(message, type = 'success') {
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        // 点击上传
+        uploadArea.addEventListener('click', (e) => {
+            console.log('点击上传区域');
+            e.preventDefault();
+            fileInput.click();
+        });
+        
+        // 拖拽上传
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        // 文件选择
+        fileInput.addEventListener('change', (e) => {
+            console.log('文件选择变化:', e.target.files);
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        function handleFile(file) {
+            console.log('处理文件:', file);
+            
+            if (!file.type.startsWith('image/')) {
+                showStatus('请选择图片文件', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'preview';
+                img.style.borderRadius = '8px';
+                
+                previewDiv.innerHTML = '';
+                previewDiv.appendChild(img);
+                
+                showStatus(`图片上传成功: ${file.name} (${file.size} bytes)`);
+                
+                console.log('图片数据:', e.target.result.substring(0, 100) + '...');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        console.log('页面加载完成');
+    </script>
+</body>
+</html> 

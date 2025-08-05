@@ -78,7 +78,7 @@
         
         .pbr-values {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
             margin-top: 15px;
         }
@@ -170,11 +170,15 @@
                 <div class="pbr-values">
                     <div class="pbr-value">
                         <strong>金属度</strong><br>
-                        {{ (result.metallic * 100).toFixed(1) }}%
+                        {{ result.metallic.toFixed(3) }}
                     </div>
                     <div class="pbr-value">
                         <strong>粗糙度</strong><br>
-                        {{ (result.roughness * 100).toFixed(1) }}%
+                        {{ result.roughness.toFixed(3) }}
+                    </div>
+                    <div class="pbr-value">
+                        <strong>透明度</strong><br>
+                        {{ result.transparency.toFixed(3) }}
                     </div>
                     <div class="pbr-value">
                         <strong>置信度</strong><br>
@@ -252,6 +256,7 @@
                                         name: image.name,
                                         metallic: data.results.metallic,
                                         roughness: data.results.roughness,
+                                        transparency: data.results.transparency,
                                         confidence: data.results.confidence,
                                         detected_material: data.results.detected_material || data.results.material_name || '',
                                         auto_detected: data.results.auto_detected_from_filename || false

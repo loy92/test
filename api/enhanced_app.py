@@ -36,7 +36,7 @@ app = Flask(__name__)
 CORS(app)
 
 # 配置
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB
 
 class MaterialDatabase:
     """材质数据库"""
@@ -176,10 +176,7 @@ class MaterialDatabase:
     
     def get_material_params(self, material_id: str) -> Optional[Dict]:
         """获取指定材质的参数范围"""
-        for category in self.materials.values():
-            if material_id in category:
-                return category[material_id]
-        return None
+        return self.materials.get(material_id)
 
 class EnhancedPBRAnalyzer:
     """增强版PBR分析器，支持材料分类"""
@@ -471,7 +468,7 @@ class EnhancedPBRAnalyzer:
         for category, materials in self.material_db.materials.items():
             for material_id, material_info in materials.items():
                 # 检查材质名称是否在文件名中
-                if material_info['name'].lower() in name_without_ext:
+                if isinstance(material_info, dict) and material_info.get('name', '').lower() in name_without_ext:
                     return category, material_id
         
         return None, None

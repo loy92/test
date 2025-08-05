@@ -174,7 +174,7 @@
         .result-data {
             flex: 1;
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             font-size: 12px;
         }
@@ -308,11 +308,15 @@
                                 </div>
                                 <div>
                                     <strong>金属度</strong><br>
-                                    {{ (result.metallic * 100).toFixed(1) }}%
+                                    {{ result.metallic.toFixed(3) }}
                                 </div>
                                 <div>
                                     <strong>粗糙度</strong><br>
-                                    {{ (result.roughness * 100).toFixed(1) }}%
+                                    {{ result.roughness.toFixed(3) }}
+                                </div>
+                                <div>
+                                    <strong>透明度</strong><br>
+                                    {{ result.transparency.toFixed(3) }}
                                 </div>
                                 <div>
                                     <strong>置信度</strong><br>
@@ -428,6 +432,7 @@
                                             image: image.preview,
                                             metallic: data.results.metallic,
                                             roughness: data.results.roughness,
+                                            transparency: data.results.transparency || 0,
                                             confidence: data.results.confidence,
                                             // 从后端结果中获取材料类型信息
                                             detected_material: data.results.detected_material || data.results.material_type || '',
@@ -451,6 +456,7 @@
                                     image: image.preview,
                                     metallic: Math.random() * 0.8 + 0.1,
                                     roughness: Math.random() * 0.6 + 0.2,
+                                    transparency: Math.random() * 0.2,
                                     confidence: Math.random() * 0.3 + 0.7,
                                     detected_material: '分析失败',
                                     auto_detected: false,
@@ -479,8 +485,9 @@
                         图片名称: result.name,
                         检测材料: result.detected_material || '未识别',
                         自动检测: result.auto_detected ? '是' : '否',
-                        金属度: (result.metallic * 100).toFixed(1) + '%',
-                        粗糙度: (result.roughness * 100).toFixed(1) + '%',
+                        金属度: result.metallic.toFixed(3),
+                        粗糙度: result.roughness.toFixed(3),
+                        透明度: result.transparency.toFixed(3),
                         置信度: (result.confidence * 100).toFixed(1) + '%',
                         分析时间: result.timestamp
                     }));
